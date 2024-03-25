@@ -215,31 +215,74 @@ class InternalWeekViewPage<T extends Object?> extends StatelessWidget {
             thickness: 1,
             height: 1,
           ),
-          SizedBox(
-            width: width,
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                SizedBox(width: timeLineWidth + hourIndicatorSettings.offset),
-                ...List.generate(
-                  filteredDates.length,
-                  (index) {
-                    final fullDayEventList =
-                        controller.getFullDayEvent(filteredDates[index]);
-                    return fullDayEventList.isEmpty
-                        ? SizedBox.shrink()
-                        : SizedBox(
-                            width: weekTitleWidth,
-                            child: fullDayEventBuilder.call(
-                              fullDayEventList,
-                              dates[index],
+          LayoutBuilder(builder: ((context, constraints) {
+            final hasAllDay = filteredDates
+                .map((e) => controller.getFullDayEvent(e))
+                .any((element) => element.isNotEmpty);
+            return hasAllDay
+                ? Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      SizedBox(
+                        width: width,
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Container(
+                              width:
+                                  timeLineWidth + hourIndicatorSettings.offset,
+                              height: 100,
+                              decoration: BoxDecoration(
+                                border: Border(
+                                  right: BorderSide(
+                                      color: Theme.of(context).dividerColor,
+                                      width: 0.5),
+                                ),
+                              ),
+                              child: Center(
+                                child: Text(
+                                  'All Day',
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .bodySmall
+                                      ?.copyWith(fontSize: 11),
+                                ),
+                              ),
                             ),
-                          );
-                  },
-                )
-              ],
-            ),
-          ),
+                            ...List.generate(
+                              filteredDates.length,
+                              (index) {
+                                final fullDayEventList = controller
+                                    .getFullDayEvent(filteredDates[index]);
+                                return Container(
+                                  height: 100,
+                                  decoration: BoxDecoration(
+                                    border: Border(
+                                      right: BorderSide(
+                                        color: Theme.of(context).dividerColor,
+                                        width: 0.5,
+                                      ),
+                                    ),
+                                  ),
+                                  width: weekTitleWidth,
+                                  child: fullDayEventBuilder.call(
+                                    fullDayEventList,
+                                    dates[index],
+                                  ),
+                                );
+                              },
+                            )
+                          ],
+                        ),
+                      ),
+                      const Divider(
+                        thickness: 0.5,
+                        height: 1,
+                      ),
+                    ],
+                  )
+                : SizedBox.shrink();
+          })),
           Expanded(
             child: SingleChildScrollView(
               controller: scrollController,
