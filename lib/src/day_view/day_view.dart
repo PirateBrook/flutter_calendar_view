@@ -241,7 +241,7 @@ class DayView<T extends Object?> extends StatefulWidget {
     this.onPageChange,
     this.dayTitleBuilder,
     this.eventArranger,
-    this.verticalLineOffset = 10,
+    this.verticalLineOffset = 0,
     this.backgroundColor = Colors.white,
     this.scrollOffset,
     this.onEventTap,
@@ -717,7 +717,11 @@ class DayViewState<T extends Object?> extends State<DayView<T>> {
 
   Widget _defaultFullDayEventBuilder(
           List<CalendarEventData<T>> events, DateTime date) =>
-      FullDayEventView(events: events, date: date);
+      FullDayEventView(
+        events: events,
+        boxConstraints: BoxConstraints(maxHeight: 65),
+        date: date,
+      );
 
   HourLinePainter _defaultHourLinePainter(
       Color lineColor,

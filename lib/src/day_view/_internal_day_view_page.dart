@@ -159,9 +159,42 @@ class InternalDayViewPage<T extends Object?> extends StatelessWidget {
       width: width,
       child: Column(
         children: [
-          fullDayEventList.isEmpty
-              ? SizedBox.shrink()
-              : fullDayEventBuilder(fullDayEventList, date),
+          SizedBox(
+            width: width,
+            height: 100,
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Container(
+                  width: timeLineWidth + hourIndicatorSettings.offset,
+                  height: 100,
+                  decoration: BoxDecoration(
+                    border: Border(
+                      right: BorderSide(
+                          color: Theme.of(context).dividerColor, width: 0.5),
+                    ),
+                  ),
+                  child: Center(
+                    child: Text(
+                      'All Day',
+                      style: Theme.of(context)
+                          .textTheme
+                          .bodySmall
+                          ?.copyWith(fontSize: 11),
+                    ),
+                  ),
+                ),
+                fullDayEventList.isEmpty
+                    ? SizedBox.shrink()
+                    : Expanded(
+                        child: fullDayEventBuilder(fullDayEventList, date)),
+              ],
+            ),
+          ),
+          Divider(
+            thickness: 1,
+            height: 1,
+          ),
           Expanded(
             child: SingleChildScrollView(
               controller: scrollController,
