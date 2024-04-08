@@ -15,18 +15,6 @@ class MonthViewWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MonthView(
-      key: state,
-      width: width,
-      onEventTap: (event, date) {
-        Navigator.of(context).push(
-          MaterialPageRoute(
-            builder: (_) => DetailsPage(
-              event: event,
-            ),
-          ),
-        );
-      },
-    );
+    return SizedBox.shrink();
   }
 }

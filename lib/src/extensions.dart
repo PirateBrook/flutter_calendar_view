@@ -132,6 +132,93 @@ extension DateTimeExtensions on DateTime {
       "This extension is not being used in this package and will be removed "
       "in next major release. Please use withoutTime instead.")
   DateTime get dateYMD => DateTime(year, month, day);
+
+  int getRowCount({int startingDayOfWeek = DateTime.monday}) {
+    final first = _firstDayOfMonth(this);
+    final daysBefore = _getDaysBefore(first, startingDayOfWeek);
+    final firstToDisplay = first.subtract(Duration(days: daysBefore));
+
+    final last = _lastDayOfMonth(this);
+    final daysAfter = _getDaysAfter(last, startingDayOfWeek);
+    final lastToDisplay = last.add(Duration(days: daysAfter));
+
+    return (lastToDisplay.difference(firstToDisplay).inDays + 1) ~/ 7;
+  }
+
+  int _getDaysBefore(DateTime firstDay, int startingDayOfWeek) {
+    return (firstDay.weekday + 7 - getWeekdayNumber(startingDayOfWeek)) % 7;
+  }
+
+  int _getDaysAfter(DateTime lastDay, int startingDayOfWeek) {
+    int invertedStartingWeekday = 8 - getWeekdayNumber(startingDayOfWeek);
+
+    int daysAfter = 7 - ((lastDay.weekday + invertedStartingWeekday) % 7);
+    if (daysAfter == 7) {
+      daysAfter = 0;
+    }
+
+    return daysAfter;
+  }
+
+  int getWeekdayNumber(int startingDayOfWeek) {
+    return startingDayOfWeek;
+  }
+
+  DateTime _firstDayOfMonth(DateTime month) {
+    return DateTime.utc(month.year, month.month, 1);
+  }
+
+  DateTime _lastDayOfMonth(DateTime month) {
+    final date = month.month < 12
+        ? DateTime.utc(month.year, month.month + 1, 1)
+        : DateTime.utc(month.year + 1, 1, 1);
+    return date.subtract(const Duration(days: 1));
+  }
+
+  /// Returns true if [other] is in the same year as [this].
+  ///
+  /// Does not account for timezones.
+  bool isAtSameYearAs(DateTime other) => year == other.year;
+
+  /// Returns true if [other] is in the same month as [this].
+  ///
+  /// This means the exact month, including year.
+  ///
+  /// Does not account for timezones.
+  bool isAtSameMonthAs(DateTime other) =>
+      isAtSameYearAs(other) && month == other.month;
+
+  /// Returns true if [other] is on the same day as [this].
+  ///
+  /// This means the exact day, including year and month.
+  ///
+  /// Does not account for timezones.
+  bool isAtSameDayAs(DateTime other) =>
+      isAtSameMonthAs(other) && day == other.day;
+
+  /// Returns true if [other] is at the same hour as [this].
+  ///
+  /// This means the exact hour, including year, month and day.
+  ///
+  /// Does not account for timezones.
+  bool isAtSameHourAs(DateTime other) =>
+      isAtSameDayAs(other) && hour == other.hour;
+
+  /// Returns true if [other] is at the same minute as [this].
+  ///
+  /// This means the exact minute, including year, month, day and hour.
+  ///
+  /// Does not account for timezones.
+  bool isAtSameMinuteAs(DateTime other) =>
+      isAtSameHourAs(other) && minute == other.minute;
+
+  /// Returns true if [other] is at the same second as [this].
+  ///
+  /// This means the exact second, including year, month, day, hour and minute.
+  ///
+  /// Does not account for timezones.
+  bool isAtSameSecondAs(DateTime other) =>
+      isAtSameMinuteAs(other) && second == other.second;
 }
 
 extension ColorExtension on Color {
@@ -209,4 +296,26 @@ extension IntExtension on int {
   String appendLeadingZero() {
     return toString().padLeft(2, '0');
   }
+}
+
+extension NumTimeExtension<T extends num> on T {
+  /// Returns a Duration represented in days
+  Duration get days => milliseconds * Duration.millisecondsPerDay;
+
+  /// Returns a Duration represented in hours
+  Duration get hours => milliseconds * Duration.millisecondsPerHour;
+
+  /// Returns a Duration represented in minutes
+  Duration get minutes => milliseconds * Duration.millisecondsPerMinute;
+
+  /// Returns a Duration represented in seconds
+  Duration get seconds => milliseconds * Duration.millisecondsPerSecond;
+
+  /// Returns a Duration represented in milliseconds
+  Duration get milliseconds => Duration(
+      microseconds: (this * Duration.microsecondsPerMillisecond).toInt());
+
+  /// Returns a Duration represented in microseconds
+  Duration get microseconds =>
+      milliseconds ~/ Duration.microsecondsPerMillisecond;
 }
